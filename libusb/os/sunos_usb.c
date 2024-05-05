@@ -82,11 +82,11 @@ static int sunos_usb_ioctl(struct libusb_device *dev, int cmd);
 
 static int sunos_get_link(di_devlink_t devlink, void *arg)
 {
-	walk_link_t *larg = (walk_link_t *)arg;
+	walk_link_t *link_arg = (walk_link_t *)arg;
 	const char *p;
 	const char *q;
 
-	if (larg->path) {
+	if (link_arg->path) {
 		char *content = (char *)di_devlink_content(devlink);
 		char *start = strstr(content, "/devices/");
 		start += strlen("/devices");
@@ -94,8 +94,8 @@ static int sunos_get_link(di_devlink_t devlink, void *arg)
 
 		/* line content must have minor node */
 		if (start == NULL ||
-		    strncmp(start, larg->path, larg->len) != 0 ||
-		    start[larg->len] != ':')
+		    strncmp(start, link_arg->path, link_arg->len) != 0 ||
+		    start[link_arg->len] != ':')
 			return (DI_WALK_CONTINUE);
 	}
 
@@ -103,7 +103,7 @@ static int sunos_get_link(di_devlink_t devlink, void *arg)
 	q = strrchr(p, '/');
 	usbi_dbg(NULL, "%s", q);
 
-	*(larg->linkpp) = strndup(p, strlen(p) - strlen(q));
+	*(link_arg->linkpp) = strndup(p, strlen(p) - strlen(q));
 
 	return (DI_WALK_TERMINATE);
 }
@@ -112,21 +112,21 @@ static int sunos_get_link(di_devlink_t devlink, void *arg)
 static int sunos_physpath_to_devlink(
 	const char *node_path, const char *match, char **link_path)
 {
-	walk_link_t larg;
+	walk_link_t link_arg;
 	di_devlink_handle_t hdl;
 
 	*link_path = NULL;
-	larg.linkpp = link_path;
+	link_arg.linkpp = link_path;
 	if ((hdl = di_devlink_init(NULL, 0)) == NULL) {
 		usbi_dbg(NULL, "di_devlink_init failure");
 		return (-1);
 	}
 
-	larg.len = strlen(node_path);
-	larg.path = (char *)node_path;
+	link_arg.len = strlen(node_path);
+	link_arg.path = (char *)node_path;
 
 	(void) di_devlink_walk(hdl, match, NULL, DI_PRIMARY_LINK,
-	    (void *)&larg, sunos_get_link);
+	    (void *)&link_arg, sunos_get_link);
 
 	(void) di_devlink_fini(&hdl);
 
@@ -624,7 +624,7 @@ sunos_add_devices(di_devlink_t link, void *arg)
 			}
 			if (usbi_sanitize_device(dev) < 0) {
 				libusb_unref_device(dev);
-				usbi_dbg(NULL, "sanatize failed: ");
+				usbi_dbg(NULL, "sanitize failed: ");
 				return (DI_WALK_TERMINATE);
 			}
 		} else {
