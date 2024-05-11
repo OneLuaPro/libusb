@@ -22,7 +22,6 @@
 #include "libusbi.h"
 
 #include <errno.h>
-#include <limits.h>
 #if defined(__ANDROID__)
 # include <unistd.h>
 #elif defined(__HAIKU__)
@@ -80,47 +79,47 @@ int usbi_cond_timedwait(pthread_cond_t *cond,
 		return LIBUSB_ERROR_OTHER;
 }
 
-unsigned long usbi_get_tid(void)
+unsigned int usbi_get_tid(void)
 {
-	static _Thread_local unsigned long tl_tid;
-	unsigned long tid;
+	static _Thread_local unsigned int tl_tid;
+	int tid;
 
 	if (tl_tid)
 		return tl_tid;
 
 #if defined(__ANDROID__)
-	tid = (unsigned long)gettid();
+	tid = gettid();
 #elif defined(__APPLE__)
 #ifdef HAVE_PTHREAD_THREADID_NP
 	uint64_t thread_id;
 
 	if (pthread_threadid_np(NULL, &thread_id) == 0)
-		tid = (unsigned long)thread_id;
+		tid = (int)thread_id;
 	else
-		tid = ULONG_MAX;
+		tid = -1;
 #else
-	tid = (unsigned long)pthread_mach_thread_np(pthread_self());
+	tid = (int)pthread_mach_thread_np(pthread_self());
 #endif
 #elif defined(__HAIKU__)
-	tid = (unsigned long)get_pthread_thread_id(pthread_self());
+	tid = get_pthread_thread_id(pthread_self());
 #elif defined(__linux__)
-	tid = (unsigned long)syscall(SYS_gettid);
+	tid = (int)syscall(SYS_gettid);
 #elif defined(__NetBSD__)
-	tid = (unsigned long)_lwp_self();
+	tid = _lwp_self();
 #elif defined(__OpenBSD__)
-	tid = (unsigned long)getthrid();
+	tid = getthrid();
 #elif defined(__sun__)
-	tid = (unsigned long)_lwp_self();
+	tid = _lwp_self();
 #else
-	tid = ULONG_MAX;
+	tid = -1;
 #endif
 
-	if (tid == ULONG_MAX) {
+	if (tid == -1) {
 		/* If we don't have a thread ID, at least return a unique
 		 * value that can be used to distinguish individual
 		 * threads. */
-		tid = (unsigned long)(uintptr_t)pthread_self();
+		tid = (int)(intptr_t)pthread_self();
 	}
 
-	return tl_tid = tid;
+	return tl_tid = (unsigned int)tid;
 }

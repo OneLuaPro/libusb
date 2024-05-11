@@ -105,9 +105,9 @@ static inline void usbi_tls_key_delete(usbi_tls_key_t key)
 	WINAPI_CHECK(TlsFree(key));
 }
 
-static inline unsigned long usbi_get_tid(void)
+static inline unsigned int usbi_get_tid(void)
 {
-	return (unsigned long)GetCurrentThreadId();
+	return (unsigned int)GetCurrentThreadId();
 }
 
 #endif /* LIBUSB_THREADS_WINDOWS_H */

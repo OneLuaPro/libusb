@@ -22,7 +22,6 @@
 
 #include "libusbi.h"
 
-#include <assert.h>
 #include <string.h>
 
 /**
@@ -140,7 +139,7 @@ int API_EXPORTED libusb_control_transfer(libusb_device_handle *dev_handle,
 
 	if ((bmRequestType & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN)
 		memcpy(data, libusb_control_transfer_get_data(transfer),
-			(size_t)transfer->actual_length);
+			transfer->actual_length);
 
 	switch (transfer->status) {
 	case LIBUSB_TRANSFER_COMPLETED:
@@ -199,10 +198,8 @@ static int do_sync_bulk_transfer(struct libusb_device_handle *dev_handle,
 
 	sync_transfer_wait_for_completion(transfer);
 
-	if (transferred) {
-		assert(transfer->actual_length >= 0);
+	if (transferred)
 		*transferred = transfer->actual_length;
-	}
 
 	switch (transfer->status) {
 	case LIBUSB_TRANSFER_COMPLETED:
@@ -315,9 +312,9 @@ int API_EXPORTED libusb_bulk_transfer(libusb_device_handle *dev_handle,
  * \param length for bulk writes, the number of bytes from data to be sent. for
  * bulk reads, the maximum number of bytes to receive into the data buffer.
  * \param transferred output location for the number of bytes actually
- * transferred. Will never be negative. Since version 1.0.21
- * (\ref LIBUSB_API_VERSION >= 0x01000105), it is legal to pass a NULL
- * pointer if you do not wish to receive this information.
+ * transferred. Since version 1.0.21 (\ref LIBUSB_API_VERSION >= 0x01000105),
+ * it is legal to pass a NULL pointer if you do not wish to receive this
+ * information.
  * \param timeout timeout (in milliseconds) that this function should wait
  * before giving up due to no response being received. For an unlimited
  * timeout, use value 0.
