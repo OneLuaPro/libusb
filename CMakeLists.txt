@@ -1,7 +1,7 @@
 # MIT License for CMake Build Infrastructure. See COPYING for the license of
 # libusb itself.
 #
-# Copyright (c) 2023 Kritzel Kratzel.
+# Copyright (c) 2023-2024 Kritzel Kratzel.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of
 # this software and associated documentation files (the "Software"), to deal in 
@@ -43,29 +43,11 @@
 cmake_minimum_required(VERSION 3.23 FATAL_ERROR)
 
 # ------------------------------------------------------------------------------
-# find liblua installation and version info
-if(NOT LUA_HINTS)
-  if(WIN32)
-    set(LUA_HINTS "c:/Apps")
-  endif()
-endif()
-find_package(liblua REQUIRED CONFIG HINTS ${LUA_HINTS})
-if(liblua_FOUND)
-  message(STATUS "liblua version        : ${liblua_VERSION}")
-  message(STATUS "liblua install prefix : ${LIBLUA_INSTALLDIR}")
-  message(STATUS "liblua include dir    : ${LIBLUA_INCLUDEDIR}")
-  message(STATUS "liblua lib dir        : ${LIBLUA_LIBDIR}")
-else()
-  message(FATAL_ERROR "Unable to find liblua version ${liblua_VERSION}.")
-endif()
-# Note: liblua_VERSION is set by find_package() directly. LIBLUA_INSTALLDIR,
-# LIBLUA_INCLUDEDIR and LIBLUA_LIBDIR are set by libluaConfigVersion.cmake in
-# <prefix>/share/cmake/liblua.
-
-# ------------------------------------------------------------------------------
-# Installation prefix directory - automatically set from find_package()
+# Installation prefix directory
 # Needs to be defined before project definition statement - for whatever reason
-set(CMAKE_INSTALL_PREFIX ${LIBLUA_INSTALLDIR})
+if(NOT CMAKE_INSTALL_PREFIX)
+  message(FATAL_ERROR "Need to have a CMAKE_INSTALL_PREFIX.")
+endif()
 
 # ------------------------------------------------------------------------------
 # Project defintion
@@ -97,14 +79,8 @@ set(INSTALL_DOCDIR
   ${CMAKE_INSTALL_DOCDIR} CACHE PATH "Installation directory for documentation")
 set(INSTALL_MANDIR
   ${CMAKE_INSTALL_MANDIR} CACHE PATH "Installation directory for manpages")
-# Lua-specific installation dirs
-set(INSTALL_SOCKET_CDIR
-  ${INSTALL_LIBDIR}/lua/${liblua_VERSION_MAJOR}.${liblua_VERSION_MINOR}/socket)
-set(INSTALL_MIME_CDIR
-  ${INSTALL_LIBDIR}/lua/${liblua_VERSION_MAJOR}.${liblua_VERSION_MINOR}/mime)
-set(INSTALL_TOP_LDIR
-  ${LIBLUA_INSTALLDIR}/share/lua/${liblua_VERSION_MAJOR}.${liblua_VERSION_MINOR})
-set(INSTALL_SOCKET_LDIR ${INSTALL_TOP_LDIR}/socket)
+set(INSTALL_DATAROOTDIR
+  ${CMAKE_INSTALL_DATAROOTDIR} CACHE PATH "Installation directory for data")
 
 # ------------------------------------------------------------------------------
 # Report to user
