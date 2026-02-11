@@ -1,7 +1,7 @@
 # MIT License for CMake Build Infrastructure. See COPYING for the license of
 # libusb itself.
 #
-# Copyright (c) 2023-2024 Kritzel Kratzel.
+# Copyright (c) 2023-2026 The OneLuaPro project authors.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of
 # this software and associated documentation files (the "Software"), to deal in 
@@ -55,7 +55,7 @@ project(libusb LANGUAGES C)
 
 # ------------------------------------------------------------------------------
 # Other settings
-set(CMAKE_VERBOSE_MAKEFILE OFF)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 if(NOT CMAKE_BUILD_TYPE)
   # Visual Studio generators irgore this setting
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)

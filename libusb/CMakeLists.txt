@@ -1,10 +1,10 @@
 # ------------------------------------------------------------------------------
-# lfs DLL
+# libusb DLL
 add_library(libusb STATIC)
 # setup platform-specific sources, compile and linker options
 if(WIN32 AND NOT MinGW)
   target_compile_options(libusb PRIVATE /D_WIN32 /D_CRT_SECURE_NO_WARNINGS)
-  # target_link_options(lfs PRIVATE /LIBPATH:${LIBLUA_LIBDIR} liblua.lib)
+  add_compile_definitions(LIBUSB_WINDOWS_HOTPLUG)
 else()
   message(FATAL_ERROR "Not yet fully implemented.")
 endif()
@@ -14,6 +14,7 @@ target_sources(libusb
   os/events_windows.h os/events_windows.c os/threads_windows.h os/threads_windows.c
   os/windows_common.h os/windows_common.c os/windows_usbdk.h os/windows_usbdk.c
   os/windows_winusb.h os/windows_winusb.c
+  os/windows_hotplug.h os/windows_hotplug.c
   libusbi.h version.h version_nano.h 
   core.c descriptor.c hotplug.c io.c strerror.c sync.c
   libusbi.h

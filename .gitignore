@@ -86,3 +86,6 @@ xcuserdata
 build/
 tags
 cscope.out
+*.*~
+build64
+
