@@ -32,7 +32,7 @@ if(WIN32 AND NOT MinGW)
     target_compile_options(libusb PRIVATE
       -Wno-unused-value
       -Wno-pragma-pack
-      -Wno-unused-param<eter
+      -Wno-unused-parameter
     )
 endif()
 else()
