@@ -1,3 +1,5 @@
+*.*~
+build64
 .deps
 .libs
 Makefile
@@ -86,6 +88,4 @@ xcuserdata
 build/
 tags
 cscope.out
-*.*~
-build64
 
