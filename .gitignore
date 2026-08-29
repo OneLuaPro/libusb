@@ -36,6 +36,8 @@ config.status
 config.sub
 *.swp
 doxygen.cfg
+libusb/version_describe.h
+.tarball-version
 examples/listdevs
 examples/xusb
 examples/dpfp
@@ -56,6 +58,7 @@ android/obj
 *.exe
 *.pc
 doc/api-1.0
+doc/man
 *.plg
 *.ncb
 *.opt
@@ -89,3 +92,19 @@ build/
 tags
 cscope.out
 
+# Claude Code: commit shared config/memory, ignore local-only artifacts
+.claude/settings.local.json
+.claude/*.local.*
+.claude/**/*.local.*
+.claude/cache/
+.claude/logs/
+.claude/sessions/
+.claude/transcripts/
+.claude/tmp/
+.claude/worktrees/
+CLAUDE.local.md
+
+# Git worktrees (e.g. Claude Code isolation worktrees, local dev worktrees)
+worktrees/
+.worktrees/
+.git-worktrees/
