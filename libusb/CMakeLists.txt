@@ -21,6 +21,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+
+# ------------------------------------------------------------------------------
+# Generate version_describe.h
+# Define the output directory and file path inside the build tree
+get_filename_component(LIBUSB_GEN_INCLUDE_DIR
+  "${CMAKE_CURRENT_BINARY_DIR}/gen_include" ABSOLUTE)
+set(VERSION_DESCRIBE_H "${LIBUSB_GEN_INCLUDE_DIR}/version_describe.h")
+
+# Determine the correct host script execution command
+if(CMAKE_HOST_WIN32)
+  find_program(POWERSHELL_EXE NAMES powershell pwsh REQUIRED)
+  set(GEN_DESCRIBE_COMMAND "${POWERSHELL_EXE}" -NoProfile -ExecutionPolicy Bypass 
+    -File "${CMAKE_SOURCE_DIR}/build-aux/gen-describe.ps1"
+  )
+else()
+  set(GEN_DESCRIBE_COMMAND "sh" "${CMAKE_SOURCE_DIR}/build-aux/gen-describe.sh")
+endif()
+
+# Create a custom rule to generate the header file
+add_custom_command(
+  OUTPUT "${VERSION_DESCRIBE_H}"
+  COMMAND ${CMAKE_COMMAND} -E make_directory "${LIBUSB_GEN_INCLUDE_DIR}"
+  COMMAND ${GEN_DESCRIBE_COMMAND} "${CMAKE_SOURCE_DIR}" "${VERSION_DESCRIBE_H}"
+  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+  COMMENT "Generating version_describe.h via libusb script..."
+  VERBATIM
+)
+
 # ------------------------------------------------------------------------------
 # libusb DLL
 add_library(libusb STATIC)
@@ -34,7 +62,7 @@ if(WIN32 AND NOT MinGW)
       -Wno-pragma-pack
       -Wno-unused-parameter
     )
-endif()
+  endif()
 else()
   message(FATAL_ERROR "Not yet fully implemented.")
 endif()
@@ -48,6 +76,8 @@ target_sources(libusb PRIVATE
   core.c descriptor.c hotplug.c io.c strerror.c sync.c
   libusbi.h
   libusb-1.0.rc
+  # Include the generated header tracking file as a source dependency
+  "${VERSION_DESCRIBE_H}"
   PUBLIC FILE_SET HEADERS
   FILES libusb.h
 )
@@ -56,6 +86,8 @@ target_include_directories(libusb
   PRIVATE
   ${CMAKE_SOURCE_DIR}/msvc
   ${CMAKE_SOURCE_DIR}/libusb
+  # Add the generated include path so the compiler finds version_describe.h
+  "${LIBUSB_GEN_INCLUDE_DIR}"
 )
 
 # ------------------------------------------------------------------------------
